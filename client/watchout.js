@@ -21,6 +21,21 @@
     return positions;
   };
 
+  // Drag event handlers
+  const dragStart = function () {
+    // d3.select(this).classed('active', true);
+    d3.select(this).style('fill', 'red');
+  };
+
+  const dragging = function (d) {
+    d3.select(this).attr('cx', d.x = d3.event.x).attr('cy', d.y = d3.event.y);
+  };
+
+  const dragEnd = function () {
+    // d3.select(this).classed('active', false);
+    d3.select(this).style('fill', 'black');
+  };
+
   // update DOM using data join
   const update = function (data) {
     const circles = g.selectAll('circle').data(data);
@@ -35,7 +50,12 @@
       .append('circle')
       .attr('r', radius)
       .attr('cx', d => d.x)
-      .attr('cy', d => d.y);
+      .attr('cy', d => d.y)
+      .call(d3.behavior.drag()
+        .on('dragstart', dragStart)
+        .on('drag', dragging)
+        .on('dragend', dragEnd)
+      );
 
     // EXIT
     // tbd
