@@ -24,7 +24,7 @@
   // Drag event handlers
   const dragStart = function () {
     // d3.select(this).classed('active', true);
-    d3.select(this).style('fill', 'red');
+    d3.select(this).style('fill', 'yellow');
   };
 
   const dragging = function (d) {
@@ -33,11 +33,31 @@
 
   const dragEnd = function () {
     // d3.select(this).classed('active', false);
-    d3.select(this).style('fill', 'purple');
+    d3.select(this).style('fill', 'orange');
   };
 
-  // update DOM using data join
-  const update = function (data) {
+  // update player
+  const updatePlayer = function (data) {
+    const player = g.selectAll('.player').data(data);
+
+    player.enter()
+      .append('circle')
+      .attr('r', radius)
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y)
+      .classed('.player', true)
+      .style('fill', 'orange')
+      .call(d3.behavior.drag()
+        .on('dragstart', dragStart)
+        .on('drag', dragging)
+        .on('dragend', dragEnd)
+      );
+  };
+
+  updatePlayer(getPositions(1));
+
+  // update enemies 
+  const updateEnemies = function (data) {
     const enemies = g.selectAll('.enemy').data(data);
 
     // UPDATE
@@ -52,18 +72,13 @@
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
       .classed('enemy', true)
-      .style('fill', 'purple')
-      .call(d3.behavior.drag()
-        .on('dragstart', dragStart)
-        .on('drag', dragging)
-        .on('dragend', dragEnd)
-      );
+      .style('fill', 'black');
 
     // EXIT
     // tbd
   };
 
   const numEnemies = 10;
-  // set interval to invoke update function 
-  setInterval(() => update(getPositions(numEnemies)), 1000);
+  updateEnemies(getPositions(numEnemies));
+  setInterval(() => updateEnemies(getPositions(numEnemies)), 1000);
 })();

@@ -4,7 +4,7 @@
 Feel free to use it if you like. */
 
 .active {
-  fill: red;
+  fill: yellow;
 }
 
 .player {
@@ -12,5 +12,5 @@ Feel free to use it if you like. */
 }
 
 .enemy {
-  fill: purple;
+  fill: black;
 }
