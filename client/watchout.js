@@ -7,23 +7,20 @@
   const g = svg.append('g');
 
   // initialize radius of circles
-  const r = 20;
-  // set padding
-  const pad = r / 2 + 10;
+  const radius = 20;
   // create random array of enemy positions
-  const randomCoordinate = (xmax, xmin) => Math.floor(xmin + Math.random() * (xmax - 2 * xmin));
+  const randomCoordinate = (xmax, xmin) => Math.round(xmin + Math.random() * (xmax - 2 * xmin));
   const getPositions = function (num) {
     const positions = [];
     for (let i = 0; i < num; i++) {
-      let x = randomCoordinate(width, pad);
-      let y = randomCoordinate(height, pad);
+      let x = randomCoordinate(width, radius);
+      let y = randomCoordinate(height, radius);
       positions.push({x, y});
     }
 
     return positions;
   };
 
-  const numEnemies = 10;
   // update DOM using data join
   const update = function (data) {
     const circles = g.selectAll('circle').data(data);
@@ -36,7 +33,7 @@
     // ENTER
     circles.enter()
       .append('circle')
-      .attr('r', r)
+      .attr('r', radius)
       .attr('cx', d => d.x)
       .attr('cy', d => d.y);
 
@@ -44,6 +41,7 @@
     // tbd
   };
 
+  const numEnemies = 10;
   // set interval to invoke update function 
   setInterval(() => update(getPositions(numEnemies)), 1000);
 })();
