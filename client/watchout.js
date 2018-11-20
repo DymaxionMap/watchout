@@ -23,13 +23,15 @@
     return positions;
   };
 
-  const enemies = getPositions(10);
+  const numEnemies = 10;
   // update DOM using data join
   const update = function (data) {
     const circles = g.selectAll('circle').data(data);
 
     // UPDATE
-    // tbd
+    circles
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y);
 
     // ENTER
     circles.enter()
@@ -42,6 +44,6 @@
     // tbd
   };
 
-  // invoke update function
-  update(enemies);
+  // set interval to invoke update function 
+  setInterval(() => update(getPositions(numEnemies)), 1000);
 })();
