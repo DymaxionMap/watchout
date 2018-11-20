@@ -10,3 +10,7 @@ Feel free to use it if you like. */
 .player {
   fill: orange;
 }
+
+.enemy {
+  fill: purple;
+}

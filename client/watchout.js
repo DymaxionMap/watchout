@@ -33,24 +33,26 @@
 
   const dragEnd = function () {
     // d3.select(this).classed('active', false);
-    d3.select(this).style('fill', 'black');
+    d3.select(this).style('fill', 'purple');
   };
 
   // update DOM using data join
   const update = function (data) {
-    const circles = g.selectAll('circle').data(data);
+    const enemies = g.selectAll('.enemy').data(data);
 
     // UPDATE
-    circles
+    enemies
       .attr('cx', d => d.x)
       .attr('cy', d => d.y);
 
     // ENTER
-    circles.enter()
+    enemies.enter()
       .append('circle')
       .attr('r', radius)
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
+      .classed('enemy', true)
+      .style('fill', 'purple')
       .call(d3.behavior.drag()
         .on('dragstart', dragStart)
         .on('drag', dragging)
