@@ -21,18 +21,39 @@
     return positions;
   };
 
+  const checkCollision = function () {
+    const player = g.selectAll('.player');
+    const playerX = player.attr('cx');
+    const playerY = player.attr('cy');
+
+    // console.log('x, y: ', player.attr('cx'), player.attr('cy'));
+    g.selectAll('.enemy').each(function (d) {
+      const enemyX = d.x;
+      const enemyY = d.y;
+      let distance = Math.sqrt((enemyX - playerX) ** 2 + (enemyY - playerY) ** 2);
+      if (distance < 2 * radius) {
+        console.log('oh noes!');
+        console.log('player x, y: ', [playerX, playerY]);
+        console.log('enemy x, y: ', [enemyX, enemyY]);
+        console.log('distance, 2*radius', [distance, 2 * radius]);
+      }
+    });
+  };
+
+
   // Drag event handlers
   const dragStart = function () {
-    // d3.select(this).classed('active', true);
+    d3.select(this).classed('active', true);
     d3.select(this).style('fill', 'yellow');
   };
 
   const dragging = function (d) {
     d3.select(this).attr('cx', d.x = d3.event.x).attr('cy', d.y = d3.event.y);
+    checkCollision()
   };
 
   const dragEnd = function () {
-    // d3.select(this).classed('active', false);
+    d3.select(this).classed('active', false);
     d3.select(this).style('fill', 'orange');
   };
 
@@ -45,7 +66,7 @@
       .attr('r', radius)
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
-      .classed('.player', true)
+      .classed('player', true)
       .style('fill', 'orange')
       .call(d3.behavior.drag()
         .on('dragstart', dragStart)
@@ -78,7 +99,12 @@
     // tbd
   };
 
+
   const numEnemies = 10;
   updateEnemies(getPositions(numEnemies));
-  setInterval(() => updateEnemies(getPositions(numEnemies)), 1000);
+  setInterval(function () {
+    const newPositions = getPositions(numEnemies)
+    updateEnemies(newPositions);
+    checkCollision();
+  }, 1000);
 })();
