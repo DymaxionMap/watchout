@@ -21,25 +21,41 @@
     return positions;
   };
 
-  const checkCollision = function () {
-    const player = g.selectAll('.player');
-    const playerX = player.attr('cx');
-    const playerY = player.attr('cy');
+  // const checkCollision = function (d) {
+  //   const {x: enemyX, y: enemyY} = d;
+  //   const player = g.selectAll('.player');
+  //   const playerX = player.attr('cx');
+  //   const playerY = player.attr('cy');
 
-    // console.log('x, y: ', player.attr('cx'), player.attr('cy'));
-    g.selectAll('.enemy').each(function (d) {
-      const enemyX = d.x;
-      const enemyY = d.y;
-      let distance = Math.sqrt((enemyX - playerX) ** 2 + (enemyY - playerY) ** 2);
-      if (distance < 2 * radius) {
+  //   const distance = Math.sqrt((enemyX - playerX) ** 2 + (enemyY - playerY) ** 2);
+  //   if (distance < 2 * radius) {
+  //     console.log('oh noes!');
+  //     console.log('player x, y: ', [playerX, playerY]);
+  //     console.log('enemy x, y: ', [enemyX, enemyY]);
+  //     console.log('distance, 2*radius', [distance, 2 * radius]);
+  //   }
+  // };
+
+  const collided = function (playerX, playerY, enemyX, enemyY) {
+    return Math.sqrt(Math.pow(enemyX - playerX, 2) + Math.pow(enemyY - playerY, 2)) < 2 * radius;
+  };
+
+  const checkCollision = function (d) {
+    const {x: playerX, y: playerY} = d;
+    const enemies = g.selectAll('.enemy');
+    // const playerX = player.attr('cx');
+    // const playerY = player.attr('cy');
+
+    enemies.each(function (enemyD) {
+      const {x: enemyX, y: enemyY} = enemyD;
+      if (collided(playerX, playerY, enemyX, enemyY)) {
         console.log('oh noes!');
         console.log('player x, y: ', [playerX, playerY]);
         console.log('enemy x, y: ', [enemyX, enemyY]);
-        console.log('distance, 2*radius', [distance, 2 * radius]);
       }
     });
-  };
 
+  };
 
   // Drag event handlers
   const dragStart = function () {
@@ -49,7 +65,7 @@
 
   const dragging = function (d) {
     d3.select(this).attr('cx', d.x = d3.event.x).attr('cy', d.y = d3.event.y);
-    checkCollision()
+    checkCollision(d);
   };
 
   const dragEnd = function () {
@@ -95,16 +111,14 @@
       .classed('enemy', true)
       .style('fill', 'black');
 
-    // EXIT
-    // tbd
+    // enemies.each(checkCollision);
   };
 
 
   const numEnemies = 10;
   updateEnemies(getPositions(numEnemies));
   setInterval(function () {
-    const newPositions = getPositions(numEnemies)
-    updateEnemies(newPositions);
-    checkCollision();
+    updateEnemies(getPositions(numEnemies));
+    // checkCollision();
   }, 1000);
 })();
