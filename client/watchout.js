@@ -21,40 +21,18 @@
     return positions;
   };
 
-  // const checkCollision = function (d) {
-  //   const {x: enemyX, y: enemyY} = d;
-  //   const player = g.selectAll('.player');
-  //   const playerX = player.attr('cx');
-  //   const playerY = player.attr('cy');
-
-  //   const distance = Math.sqrt((enemyX - playerX) ** 2 + (enemyY - playerY) ** 2);
-  //   if (distance < 2 * radius) {
-  //     console.log('oh noes!');
-  //     console.log('player x, y: ', [playerX, playerY]);
-  //     console.log('enemy x, y: ', [enemyX, enemyY]);
-  //     console.log('distance, 2*radius', [distance, 2 * radius]);
-  //   }
-  // };
-
   const collided = function (playerX, playerY, enemyX, enemyY) {
     return Math.sqrt(Math.pow(enemyX - playerX, 2) + Math.pow(enemyY - playerY, 2)) < 2 * radius;
   };
 
-  const checkCollision = function (d) {
-    const {x: playerX, y: playerY} = d;
-    const enemies = g.selectAll('.enemy');
-    // const playerX = player.attr('cx');
-    // const playerY = player.attr('cy');
+  const checkCollision = function (enemyX, enemyY) {
+    const player = g.select('.player');
+    const playerX = Number(player.attr('cx'));
+    const playerY = Number(player.attr('cy'));
 
-    enemies.each(function (enemyD) {
-      const {x: enemyX, y: enemyY} = enemyD;
-      if (collided(playerX, playerY, enemyX, enemyY)) {
-        console.log('oh noes!');
-        console.log('player x, y: ', [playerX, playerY]);
-        console.log('enemy x, y: ', [enemyX, enemyY]);
-      }
-    });
-
+    if (collided(playerX, playerY, enemyX, enemyY)) {
+      console.log('oh noes! collided!');
+    }
   };
 
   // Drag event handlers
@@ -65,7 +43,6 @@
 
   const dragging = function (d) {
     d3.select(this).attr('cx', d.x = d3.event.x).attr('cy', d.y = d3.event.y);
-    checkCollision(d);
   };
 
   const dragEnd = function () {
@@ -93,14 +70,30 @@
 
   updatePlayer(getPositions(1));
 
+  const moveAndCollideTween = function (d) {
+    let enemy = d3.select(this);
+    let startX = Number(enemy.attr('cx'));
+    let startY = Number(enemy.attr('cy'));
+    let endX = d.x;
+    let endY = d.y;
+    return (function(t) {
+      let x = startX + (endX - startX) * t;
+      let y = startY + (endY - startY) * t;
+      checkCollision(x, y);
+      enemy.attr('cx', d => x);
+      enemy.attr('cy', d => y);
+    });
+  };
+
   // update enemies 
   const updateEnemies = function (data) {
     const enemies = g.selectAll('.enemy').data(data);
 
     // UPDATE
     enemies
-      .attr('cx', d => d.x)
-      .attr('cy', d => d.y);
+      .transition()
+      .duration(1000)
+      .tween('moveAndCollide', moveAndCollideTween);
 
     // ENTER
     enemies.enter()
@@ -111,14 +104,11 @@
       .classed('enemy', true)
       .style('fill', 'black');
 
-    // enemies.each(checkCollision);
   };
-
 
   const numEnemies = 10;
   updateEnemies(getPositions(numEnemies));
   setInterval(function () {
     updateEnemies(getPositions(numEnemies));
-    // checkCollision();
   }, 1000);
 })();
