@@ -6,11 +6,16 @@
   const width = Number(svg.attr('width'));
   const g = svg.append('g');
 
-  // Scorebox
+  // Game parameters
   const scoreBox = d3.select('.current');
   const highScoreBox = d3.select('.highscore');
   let score = 0;
   let highScore = 0;
+  let collisions = 0;
+  let invincible = false;
+  const invincibilityDuration = 400;
+  const enemyMoveDuration = 1000;
+  const scoreUpdateDelay = 200;
 
   // Player and enemy radius
   const radius = 20;
@@ -38,9 +43,13 @@
     const playerX = Number(player.attr('cx'));
     const playerY = Number(player.attr('cy'));
 
-    if (collided(playerX, playerY, enemyX, enemyY)) {
+    if (!invincible && collided(playerX, playerY, enemyX, enemyY)) {
       console.log('oh noes! collided!');
       score = 0;
+      collisions += 1;
+      invincible = true;
+      setTimeout(() => invincible = false, invincibilityDuration);
+      d3.select('.collisions').text(`Collisions: ${collisions}`);
     }
   };
 
@@ -99,7 +108,7 @@
     // UPDATE
     enemies
       .transition()
-      .duration(1000)
+      .duration(enemyMoveDuration)
       .tween('moveAndCollide', moveAndCollideTween);
 
     // ENTER
@@ -114,11 +123,13 @@
   };
 
   const increaseScore = function () {
-    score += 10;
-    scoreBox.text(`Current score: ${score}`);
-    if (score > highScore) {
-      highScore = score;
-      highScoreBox.text(`High score: ${highScore}`);
+    if (!invincible) {
+      score += 10;
+      scoreBox.text(`Current score: ${score}`);
+      if (score > highScore) {
+        highScore = score;
+        highScoreBox.text(`High score: ${highScore}`);
+      }
     }
   };
 
@@ -130,8 +141,8 @@
     updateEnemies(getPositions(numEnemies));
     setInterval(function () {
       updateEnemies(getPositions(numEnemies));
-    }, 1000);
-    setInterval(increaseScore, 200);
+    }, enemyMoveDuration);
+    setInterval(increaseScore, scoreUpdateDelay);
   };
 
   play();
