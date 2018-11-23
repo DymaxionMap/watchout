@@ -6,9 +6,16 @@
   const width = Number(svg.attr('width'));
   const g = svg.append('g');
 
-  // initialize radius of circles
+  // Scorebox
+  const scoreBox = d3.select('.current');
+  const highScoreBox = d3.select('.highscore');
+  let score = 0;
+  let highScore = 0;
+
+  // Player and enemy radius
   const radius = 20;
-  // create random array of enemy positions
+
+  // Enemy positions
   const randomCoordinate = (xmax, xmin) => Math.round(xmin + Math.random() * (xmax - 2 * xmin));
   const getPositions = function (num) {
     const positions = [];
@@ -21,6 +28,7 @@
     return positions;
   };
 
+  // Collision checking
   const collided = function (playerX, playerY, enemyX, enemyY) {
     return Math.sqrt(Math.pow(enemyX - playerX, 2) + Math.pow(enemyY - playerY, 2)) < 2 * radius;
   };
@@ -32,6 +40,7 @@
 
     if (collided(playerX, playerY, enemyX, enemyY)) {
       console.log('oh noes! collided!');
+      score = 0;
     }
   };
 
@@ -67,8 +76,6 @@
         .on('dragend', dragEnd)
       );
   };
-
-  updatePlayer(getPositions(1));
 
   const moveAndCollideTween = function (d) {
     let enemy = d3.select(this);
@@ -106,9 +113,27 @@
 
   };
 
+  const increaseScore = function () {
+    score += 10;
+    scoreBox.text(`Current score: ${score}`);
+    if (score > highScore) {
+      highScore = score;
+      highScoreBox.text(`High score: ${highScore}`);
+    }
+  };
+
   const numEnemies = 10;
-  updateEnemies(getPositions(numEnemies));
-  setInterval(function () {
+
+  // Kick off the game
+  const play = function () {
+    updatePlayer(getPositions(1));
     updateEnemies(getPositions(numEnemies));
-  }, 1000);
+    setInterval(function () {
+      updateEnemies(getPositions(numEnemies));
+    }, 1000);
+    setInterval(increaseScore, 200);
+  };
+
+  play();
+
 })();
