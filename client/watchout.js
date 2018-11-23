@@ -5,6 +5,7 @@
   const height = Number(svg.attr('height'));
   const width = Number(svg.attr('width'));
   const g = svg.append('g');
+  // const imageUrl = 'space-invader.gif';
 
   // Game parameters
   const scoreBox = d3.select('.current');
@@ -118,7 +119,7 @@
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
       .classed('enemy', true)
-      .style('fill', 'black');
+      .attr('fill', 'url(#image)');
 
   };
 
