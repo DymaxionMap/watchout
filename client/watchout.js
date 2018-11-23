@@ -5,7 +5,10 @@
   const height = Number(svg.attr('height'));
   const width = Number(svg.attr('width'));
   const g = svg.append('g');
-  // const imageUrl = 'space-invader.gif';
+
+  const playerColor = '#013fa5';
+  const playerHighlightColor = '#2253a3';
+  const playerHitColor = 'red';
 
   // Game parameters
   const scoreBox = d3.select('.current');
@@ -14,7 +17,7 @@
   let highScore = 0;
   let collisions = 0;
   let invincible = false;
-  const invincibilityDuration = 400;
+  const invincibilityDuration = 300;
   const enemyMoveDuration = 1000;
   const scoreUpdateDelay = 200;
 
@@ -45,19 +48,22 @@
     const playerY = Number(player.attr('cy'));
 
     if (!invincible && collided(playerX, playerY, enemyX, enemyY)) {
-      console.log('oh noes! collided!');
       score = 0;
       collisions += 1;
       invincible = true;
-      setTimeout(() => invincible = false, invincibilityDuration);
+      player.style('fill', playerHitColor);
+      setTimeout(function () {
+        invincible = false;
+        player.style('fill', playerColor);
+      }, invincibilityDuration);
+      d3.select('.current').text(`Current score: ${score}`);
       d3.select('.collisions').text(`Collisions: ${collisions}`);
     }
   };
 
   // Drag event handlers
   const dragStart = function () {
-    d3.select(this).classed('active', true);
-    d3.select(this).style('fill', 'yellow');
+    d3.select(this).style('fill', playerHighlightColor);
   };
 
   const dragging = function (d) {
@@ -65,8 +71,7 @@
   };
 
   const dragEnd = function () {
-    d3.select(this).classed('active', false);
-    d3.select(this).style('fill', 'orange');
+    d3.select(this).style('fill', playerColor);
   };
 
   // update player
@@ -79,7 +84,7 @@
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
       .classed('player', true)
-      .style('fill', 'orange')
+      .style('fill', playerColor)
       .call(d3.behavior.drag()
         .on('dragstart', dragStart)
         .on('drag', dragging)
